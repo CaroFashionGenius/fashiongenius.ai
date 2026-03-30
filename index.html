@@ -749,24 +749,42 @@
 </footer>
 
 <script>
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwKlnulVSzaR32hynKvZii-Um9YEfr6oYNhE909jmhiieRHbuL1F60U9sWtlmAowqJdkQ/exec';
+
   function submitWaitlist() {
     const email = document.getElementById('email-input').value;
     if (!email || !email.includes('@')) { alert('Please enter a valid email address'); return; }
+    
+    // Show success immediately for better UX
     document.getElementById('waitlist-form').style.display = 'none';
     document.getElementById('waitlist-success').classList.add('show');
     const counter = document.getElementById('counter-num');
     counter.textContent = parseInt(counter.textContent) + 1;
-    console.log('Waitlist signup:', email);
+    
+    // Send to Google Sheets
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
   }
   
   function submitWaitlistBottom() {
     const email = document.getElementById('email-input-bottom').value;
     if (!email || !email.includes('@')) { alert('Please enter a valid email address'); return; }
+    
     document.getElementById('waitlist-form-bottom').style.display = 'none';
     document.getElementById('waitlist-success-bottom').classList.add('show');
     const counter = document.getElementById('counter-num');
     counter.textContent = parseInt(counter.textContent) + 1;
-    console.log('Waitlist signup:', email);
+    
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
   }
 </script>
 
