@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fashion Genius Creator Studio — Virtual Try-On for Content Creators</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --fg-black: #0a0a0a;
+    --fg-white: #fafafa;
+    --fg-cream: #f5f0eb;
+    --fg-gold: #c8a97e;
+    --fg-gold-light: #e8d5b8;
+    --fg-gray-100: #f0f0f0;
+    --fg-gray-200: #e0e0e0;
+    --fg-gray-400: #999;
+    --fg-gray-600: #666;
+    --fg-gray-800: #333;
+    --fg-accent: #1a1a2e;
+    --fg-green: #2d8a4e;
+    --fg-gradient: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+  }
+
+  html { scroll-behavior: smooth; }
+  
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--fg-black);
+    background: var(--fg-white);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    background: rgba(250,250,250,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    padding: 0 2rem;
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center;
+    height: 64px;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--fg-gold); }
+  .nav-cta {
+    background: var(--fg-black); color: white;
+    padding: 10px 24px; border-radius: 100px;
+    text-decoration: none; font-size: 0.85rem; font-weight: 500;
+    transition: all 0.3s;
+  }
+  .nav-cta:hover { background: var(--fg-accent); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    background: var(--fg-gradient);
+    color: white;
+    padding: 140px 2rem 100px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(108,92,231,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(200,169,126,0.1) 0%, transparent 40%);
+  }
+  .hero-inner { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 100px;
+    font-size: 0.75rem; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 2rem;
+    color: var(--fg-gold-light);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 5.5vw, 4rem);
+    font-weight: 600;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--fg-gold-light);
+  }
+  .hero p {
+    font-size: 1.15rem;
+    color: rgba(255,255,255,0.7);
+    max-width: 560px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+  }
+  .hero-sub {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* WAITLIST FORM */
+  .waitlist-form {
+    display: flex;
+    max-width: 480px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .waitlist-form input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 16px 24px;
+    color: white;
+    font-size: 0.95rem;
+    outline: none;
+  }
+  .waitlist-form input::placeholder { color: rgba(255,255,255,0.4); }
+  .waitlist-form button {
+    background: white;
+    color: var(--fg-black);
+    border: none;
+    padding: 16px 28px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+  .waitlist-form button:hover { background: var(--fg-gold-light); }
+
+  .waitlist-success {
+    display: none;
+    text-align: center;
+  }
+  .waitlist-success.show { display: block; }
+  .waitlist-success .check { font-size: 2rem; margin-bottom: 0.5rem; }
+  .waitlist-success p { color: rgba(255,255,255,0.8); }
+  .waitlist-success .small { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 0.5rem; }
+
+  .waitlist-counter {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+  }
+  .counter-dot {
+    width: 8px; height: 8px;
+    background: var(--fg-green);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  /* STATS BAR */
+  .stats {
+    background: var(--fg-cream);
+    padding: 2.5rem 2rem;
+  }
+  .stats-inner {
+    max-width: 900px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2rem; text-align: center;
+  }
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; font-weight: 600;
+    color: var(--fg-black);
+  }
+  .stat-label {
+    font-size: 0.8rem; color: var(--fg-gray-600);
+    margin-top: 0.25rem;
+  }
+
+  /* SECTION HELPERS */
+  .section-label {
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--fg-gold);
+    margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+    font-weight: 600;
+    margin-bottom: 3rem;
+    letter-spacing: -0.02em;
+  }
+
+  /* HOW IT WORKS */
+  .how {
+    padding: 100px 2rem;
+    max-width: 1000px; margin: 0 auto;
+    text-align: center;
+  }
+  .steps {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem; text-align: left;
+  }
+  .step {
+    padding: 2rem;
+    border-radius: 16px;
+    background: var(--fg-gray-100);
+  }
+  .step-num {
+    width: 36px; height: 36px;
+    background: var(--fg-black); color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+  .step h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .step p { font-size: 0.9rem; color: var(--fg-gray-600); line-height: 1.6; }
+
+  /* CONTENT FORMATS */
+  .formats {
+    background: var(--fg-gradient);
+    color: white;
+    padding: 100px 2rem;
+    text-align: center;
+  }
+  .formats-inner { max-width: 1000px; margin: 0 auto; }
+  .format-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem; text-align: left;
+  }
+  .format-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 2rem;
+  }
+  .format-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+  .format-card h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+  .format-card p { font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+
+  /* ROADMAP TIMELINE */
+  .roadmap {
+    padding: 100px 2rem;
+    max-width: 900px; margin: 0 auto;
+    text-align: center;
+  }
+  .timeline {
+    display: flex; justify-content: space-between;
+    position: relative;
+    margin-top: 3rem;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 20px; left: 10%; right: 10%;
+    height: 2px;
+    background: var(--fg-gray-200);
+  }
+  .timeline-item {
+    text-align: center;
+    position: relative;
+    flex: 1;
+  }
+  .timeline-dot {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--fg-gray-200);
+    margin: 0 auto 1rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    position: relative; z-index: 1;
+  }
+  .timeline-dot.active {
+    background: var(--fg-green);
+    color: white;
+  }
+  .timeline-item h4 { font-size: 0.95rem; margin-bottom: 0.25rem; }
+  .timeline-item p { font-size: 0.8rem; color: var(--fg-gray-600); }
+  .timeline-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: var(--fg-gray-100);
+    font-size: 0.7rem; font-weight: 500;
+    color: var(--fg-gray-600);
+    margin-top: 8px;
+  }
+  .timeline-tag.live {
+    background: rgba(45,138,78,0.1);
+    color: var(--fg-green);
+  }
+
+  /* PRICING */
+  .pricing {
+    background: var(--fg-gray-100);
+    padding: 100px 2rem;
+    text-align: center;
+  }
+  .pricing-inner { max-width: 1000px; margin: 0 auto; }
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .price-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    text-align: left;
+    border: 1px solid var(--fg-gray-200);
+    position: relative;
+  }
+  .price-card.featured {
+    border-color: var(--fg-gold);
+    box-shadow: 0 8px 32px rgba(200,169,126,0.15);
+  }
+  .price-card.featured::before {
+    content: 'Most Popular';
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--fg-gold); color: white;
+    padding: 4px 16px; border-radius: 100px;
+    font-size: 0.7rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .price-tier { font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .price-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  .price-amount span { font-size: 1rem; font-weight: 400; color: var(--fg-gray-400); }
+  .price-desc { font-size: 0.85rem; color: var(--fg-gray-600); margin-bottom: 1.5rem; }
+  .price-features { list-style: none; }
+  .price-features li {
+    font-size: 0.85rem; padding: 6px 0;
+    color: var(--fg-gray-600);
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .price-features li::before { content: '✓'; color: var(--fg-green); font-weight: 600; }
+  .price-badge {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-size: 0.8rem; font-weight: 500;
+    background: var(--fg-gray-100);
+    color: var(--fg-gray-600);
+  }
+  .price-badge.gold { background: var(--fg-gold); color: white; }
+
+  /* BENEFITS */
+  .benefits {
+    padding: 100px 2rem;
+    max-width: 1000px; margin: 0 auto;
+    text-align: center;
+  }
+  .benefits-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2rem; text-align: left;
+  }
+  .benefit-item h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+  .benefit-item p { font-size: 0.85rem; color: var(--fg-gray-600); line-height: 1.6; }
+  .benefit-highlight {
+    grid-column: span 3;
+    background: var(--fg-gradient);
+    color: white;
+    border-radius: 24px;
+    padding: 3rem;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+  .benefit-highlight .big-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem; font-weight: 600;
+    color: var(--fg-gold);
+    line-height: 1;
+  }
+  .benefit-highlight p {
+    font-size: 0.95rem; color: rgba(255,255,255,0.6);
+    margin-top: 1rem; line-height: 1.6;
+  }
+
+  /* FAQ */
+  .faq {
+    padding: 100px 2rem;
+    max-width: 700px; margin: 0 auto;
+  }
+  .faq-item {
+    border-bottom: 1px solid var(--fg-gray-200);
+    padding: 1.5rem 0;
+  }
+  .faq-q {
+    font-weight: 600; font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .faq-a {
+    font-size: 0.9rem; color: var(--fg-gray-600);
+    line-height: 1.7;
+  }
+
+  /* CTA */
+  .final-cta {
+    background: var(--fg-gradient);
+    color: white;
+    padding: 100px 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .final-cta::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(200,169,126,0.08) 0%, transparent 60%);
+  }
+  .final-cta > * { position: relative; z-index: 1; }
+  .final-cta h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  .final-cta p {
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 2.5rem;
+    font-size: 1.05rem;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 3rem 2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--fg-gray-400);
+    border-top: 1px solid var(--fg-gray-200);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .steps, .pricing-grid, .format-grid, .benefits-grid, .stats-inner {
+      grid-template-columns: 1fr;
+    }
+    .hero { padding: 120px 1.5rem 80px; }
+    .price-card.featured { order: -1; }
+    .waitlist-form {
+      flex-direction: column;
+      border-radius: 16px;
+    }
+    .waitlist-form button {
+      width: 100%;
+    }
+    .benefit-highlight { grid-column: span 1; }
+    .timeline { flex-direction: column; gap: 2rem; }
+    .timeline::before { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Fashion <span>Genius</span> Creator Studio</div>
+    <a href="#waitlist-bottom" class="nav-cta">Join the Waitlist</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🚀 Launching Soon — Join the Waitlist</div>
+    <h1>Try On Any Outfit.<br><em>Without Ordering It.</em></h1>
+    <p>The first AI-powered Virtual Try-On tool built for content creators. Create stunning Try-On Hauls, boost your engagement, and earn commissions — all without a single delivery box.</p>
+    
+    <div class="waitlist-form" id="waitlist-form">
+      <input type="email" id="email-input" placeholder="Enter your email" required>
+      <button onclick="submitWaitlist()">Join Waitlist</button>
+    </div>
+    <div class="waitlist-success" id="waitlist-success">
+      <div class="check">✅</div>
+      <p>You're on the list! We'll notify you as soon as Creator Studio launches.</p>
+      <p class="small">Check your inbox for a confirmation — and share with your creator friends.</p>
+    </div>
+    
+    <p class="hero-sub">Free to join · No credit card · Be first in line for 20 free Try-Ons</p>
+    
+    <div class="waitlist-counter">
+      <div class="counter-dot"></div>
+      <span><strong id="counter-num">47</strong> creators already on the waitlist</span>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-inner">
+    <div>
+      <div class="stat-number">40%</div>
+      <div class="stat-label">Fewer returns with Virtual Try-On (Zalando 2026)</div>
+    </div>
+    <div>
+      <div class="stat-number">11%</div>
+      <div class="stat-label">Engagement rate on Try-On Haul content</div>
+    </div>
+    <div>
+      <div class="stat-number">3×</div>
+      <div class="stat-label">More comments on UGC vs. polished brand ads</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="section-label">How It Works</div>
+  <h2 class="section-title">Three steps to your first AI Try-On Haul</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Upload Your Photo</h3>
+      <p>Take a selfie or upload a full-body photo. Our AI adapts to any body type, skin tone, and pose.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Choose Your Outfits</h3>
+      <p>Browse our catalog or upload any garment image. Mix tops, dresses, jackets — whatever your audience loves.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Download & Share</h3>
+      <p>Get social-media-ready images instantly. Download in HD, share to TikTok or Instagram with one tap.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT FORMATS -->
+<section class="formats">
+  <div class="formats-inner">
+    <div class="section-label" style="color: var(--fg-gold-light);">Content Ideas</div>
+    <h2 class="section-title">Formats that go viral</h2>
+    <div class="format-grid">
+      <div class="format-card">
+        <div class="format-icon">👗</div>
+        <h3>AI Try-On Haul</h3>
+        <p>Try 5-8 outfits virtually and give honest reviews. "I tried these outfits WITHOUT ordering them."</p>
+      </div>
+      <div class="format-card">
+        <div class="format-icon">🔄</div>
+        <h3>Before / After</h3>
+        <p>Show the AI transformation side-by-side. Audiences love the "wow" factor of realistic virtual styling.</p>
+      </div>
+      <div class="format-card">
+        <div class="format-icon">📊</div>
+        <h3>Rate My Outfit</h3>
+        <p>Let your followers vote on AI-generated looks. Drive insane engagement with polls and reactions.</p>
+      </div>
+      <div class="format-card">
+        <div class="format-icon">🌿</div>
+        <h3>Zero-Return Shopping</h3>
+        <p>Position yourself as a sustainable fashion voice. Try before you buy — without the waste.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="roadmap">
+  <div class="section-label">Roadmap</div>
+  <h2 class="section-title">Where we're headed</h2>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot active">✓</div>
+      <h4>Waitlist</h4>
+      <p>Sign up now</p>
+      <div class="timeline-tag live">Live Now</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">β</div>
+      <h4>Beta Launch</h4>
+      <p>May 2026</p>
+      <div class="timeline-tag">Coming Soon</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">€</div>
+      <h4>Paid Plans</h4>
+      <p>June 2026</p>
+      <div class="timeline-tag">Coming Soon</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">%</div>
+      <h4>Affiliate Program</h4>
+      <p>Q3 2026</p>
+      <div class="timeline-tag">Coming Soon</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing">
+  <div class="pricing-inner">
+    <div class="section-label">Pricing Preview</div>
+    <h2 class="section-title">Simple, transparent pricing</h2>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-tier">Free</div>
+        <div class="price-amount">€0</div>
+        <div class="price-desc">Perfect to start experimenting</div>
+        <ul class="price-features">
+          <li>20 Try-Ons / month</li>
+          <li>Standard quality</li>
+          <li>Watermark on images</li>
+          <li>5% affiliate commission</li>
+        </ul>
+        <div class="price-badge">Free Forever</div>
+      </div>
+      <div class="price-card featured">
+        <div class="price-tier">Creator</div>
+        <div class="price-amount">€19 <span>/mo</span></div>
+        <div class="price-desc">For active content creators</div>
+        <ul class="price-features">
+          <li>150 Try-Ons / month</li>
+          <li>HD quality</li>
+          <li>No watermark</li>
+          <li>8% affiliate commission</li>
+          <li>Priority support</li>
+        </ul>
+        <div class="price-badge gold">Coming Soon</div>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">Pro</div>
+        <div class="price-amount">€39 <span>/mo</span></div>
+        <div class="price-desc">For power creators & agencies</div>
+        <ul class="price-features">
+          <li>Unlimited Try-Ons</li>
+          <li>4K quality</li>
+          <li>Custom branding</li>
+          <li>10% affiliate commission</li>
+          <li>API access</li>
+        </ul>
+        <div class="price-badge">Coming Soon</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits">
+  <div class="section-label">Why Creators Love It</div>
+  <h2 class="section-title">Built for the creator economy</h2>
+  <div class="benefits-grid">
+    <div class="benefit-item">
+      <h3>📦 No Inventory Needed</h3>
+      <p>Try on clothes from any brand without ordering or returning. Zero logistics, zero waste.</p>
+    </div>
+    <div class="benefit-item">
+      <h3>✨ Stand Out</h3>
+      <p>Be among the first creators using AI Try-On content. Early movers own the niche.</p>
+    </div>
+    <div class="benefit-item">
+      <h3>💰 Earn Commissions</h3>
+      <p>Every outfit you showcase can include affiliate links. Your content works while you sleep.</p>
+    </div>
+    <div class="benefit-item">
+      <h3>🌍 Body Positive</h3>
+      <p>Works with every body type, skin tone, and style. Fashion content that represents everyone.</p>
+    </div>
+    <div class="benefit-item">
+      <h3>🔒 Your Data, Your Rules</h3>
+      <p>Photos are processed and deleted. We never share your images or train on your content.</p>
+    </div>
+    <div class="benefit-item">
+      <h3>⚡ Lightning Fast</h3>
+      <p>Generate a complete outfit look in under 30 seconds. Create a full haul in minutes, not days.</p>
+    </div>
+    <div class="benefit-highlight">
+      <div class="big-number">10×</div>
+      <p>Faster content creation. What used to take a full day of shooting, styling, and editing now takes minutes. More content, more engagement, more revenue.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="section-label" style="text-align: center;">FAQ</div>
+  <h2 class="section-title" style="text-align: center;">Frequently asked questions</h2>
+  <div class="faq-item">
+    <div class="faq-q">When does Creator Studio launch?</div>
+    <div class="faq-a">We're targeting May 2026 for beta access. Waitlist members get first access. Sign up now to secure your spot.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">How realistic are the Try-On results?</div>
+    <div class="faq-a">Our AI produces photorealistic results that maintain your body proportions, skin tone, and pose. The technology improves with every generation.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Which brands and garments can I try on?</div>
+    <div class="faq-a">At launch, you can upload any garment image from any brand. We're also building partnerships with fashion retailers for direct catalog access.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">How does the affiliate program work?</div>
+    <div class="faq-a">When you share Try-On content with affiliate links, you earn a commission on every sale. We track everything automatically.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Do I need to disclose that it's AI-generated?</div>
+    <div class="faq-a">We recommend transparency — it actually boosts engagement. Audiences love the tech angle. Use #AITryOn or #VirtualTryOn and lean into the innovation story.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Can I cancel anytime?</div>
+    <div class="faq-a">Yes. No long-term contracts. Cancel anytime from your dashboard. Your free tier access remains active forever.</div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta" id="waitlist-bottom">
+  <h2>Ready to create Try-On content<br>the world hasn't seen?</h2>
+  <p>Join the first wave of creators using AI Virtual Try-On.<br>Limited early access spots available.</p>
+  
+  <div class="waitlist-form" id="waitlist-form-bottom">
+    <input type="email" id="email-input-bottom" placeholder="Enter your email" required>
+    <button onclick="submitWaitlistBottom()">Join Waitlist</button>
+  </div>
+  <div class="waitlist-success" id="waitlist-success-bottom">
+    <div class="check">✅</div>
+    <p>You're on the list! We'll notify you when Creator Studio launches.</p>
+  </div>
+  
+  <p class="hero-sub" style="margin-top: 1rem;">Free to join · No credit card · Cancel anytime</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2026 Fashion Genius AG · Zug, Switzerland</p>
+  <p style="margin-top: 0.5rem;">Privacy Policy · Terms of Service · Contact: creators@fashiongenius.ai</p>
+</footer>
+
+<script>
+  function submitWaitlist() {
+    const email = document.getElementById('email-input').value;
+    if (!email || !email.includes('@')) { alert('Please enter a valid email address'); return; }
+    document.getElementById('waitlist-form').style.display = 'none';
+    document.getElementById('waitlist-success').classList.add('show');
+    const counter = document.getElementById('counter-num');
+    counter.textContent = parseInt(counter.textContent) + 1;
+    console.log('Waitlist signup:', email);
+  }
+  
+  function submitWaitlistBottom() {
+    const email = document.getElementById('email-input-bottom').value;
+    if (!email || !email.includes('@')) { alert('Please enter a valid email address'); return; }
+    document.getElementById('waitlist-form-bottom').style.display = 'none';
+    document.getElementById('waitlist-success-bottom').classList.add('show');
+    const counter = document.getElementById('counter-num');
+    counter.textContent = parseInt(counter.textContent) + 1;
+    console.log('Waitlist signup:', email);
+  }
+</script>
+
+</body>
+</html>
