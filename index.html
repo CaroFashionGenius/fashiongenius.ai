@@ -576,7 +576,7 @@ async function loadCounter() {
 loadCounter();
 
 // GOOGLE SHEETS WEBHOOK — replace with your Apps Script URL
-const WEBHOOK = 'https://script.google.com/macros/s/AKfycbzqgyQAfOMzY2zhV2wwYY7wGQVKS0L5CCwqo_XQ60FpVGfzuY_gUsKVkcvIpPcEyjiCcg/exec';
+const WEBHOOK = 'https://script.google.com/macros/s/AKfycbxQoZLsKu_K8kgp2Hq1ZblLBFnMQ7E1K6f_xC9lUBNTqSZBplAIrgfqCYf2Lp9h4hnoGQ/exec';
 
 // LANG
 let currentLang = 'de';
@@ -614,9 +614,8 @@ async function submitWaitlist() {
   btn.disabled = true;
   if (WEBHOOK !== 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec') {
     try {
-      await fetch(WEBHOOK, { method:'POST', mode:'no-cors',
-        body: JSON.stringify({name,handle,email,platform,source:'creator-studio-waitlist',lang:currentLang,ts:new Date().toISOString()}),
-        headers:{'Content-Type':'application/json'} });
+      const p1 = new URLSearchParams({name,handle,email,platform,source:'creator-studio-waitlist',lang:currentLang,ts:new Date().toISOString()});
+      await fetch(WEBHOOK + '?' + p1.toString(), { method:'GET', mode:'no-cors' });
     } catch(e) {}
   }
   const cnt = document.getElementById('wl-count');
@@ -751,9 +750,8 @@ async function lolaHandle(val) {
       await lolaSay(isDE ? 'Caroline schickt dir den Beta-Zugang direkt per E-Mail — check dein Postfach!' : 'Caroline will send your beta access directly by email — check your inbox!', 1000);
       if (WEBHOOK !== 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec') {
         try {
-          await fetch(WEBHOOK, { method:'POST', mode:'no-cors',
-            body: JSON.stringify({...lolaData, source:'lola-chat', flag: flagged?'competitor':'', ts:new Date().toISOString()}),
-            headers:{'Content-Type':'application/json'} });
+          const p2 = new URLSearchParams({...lolaData, source:'lola-chat', flag: flagged?'competitor':'', ts:new Date().toISOString()});
+          await fetch(WEBHOOK + '?' + p2.toString(), { method:'GET', mode:'no-cors' });
         } catch(e) {}
       }
       const cnt = document.getElementById('wl-count');
